@@ -42,7 +42,8 @@ cd Developing_Applications_with_Apache_Spark
 5. creates the classic cluster **Developing Apps with Apache Spark (&lt;you&gt;)** (DBR 17.3 LTS, dedicated,
    1 worker, `Standard_D4ds_v5`, auto-terminates after 30 min), terminates it right away, and adds its ID to
    `databricks.local.yml` so the VS Code extension uses it;
-6. writes `.env` for local runs, pointing Databricks Connect at that cluster;
+6. writes `.env` for local runs, pointing Databricks Connect at that cluster, and `.databricks/.databricks.env`
+   so local notebook kernels get `spark`, `dbutils` and `display`;
 7. syncs the course to `/Workspace/Users/<you>/.bundle/developing-applications-with-apache-spark-course/dev/files`.
 
 **Run the course**
@@ -137,6 +138,7 @@ Rule of thumb: **edit locally, run the lessons in the workspace** (from the sync
 | VS Code: Databricks sidebar never logs in; `UrlError: Invalid host name` | No `workspace.host` in the bundle | Run `./setup.sh`, then **Developer: Reload Window** |
 | Local run: `default auth: metadata-service ... Connection refused` | The extension's auth helper moved to a new port | `DATABRICKS_AUTH_TYPE=databricks-cli` in `.env` (setup.sh writes it); restart the kernel |
 | Local run: `cannot configure default credentials`, OAuth token expired | CLI login expired | `databricks auth login -p azure-de` |
+| Local notebook: `NameError: name 'spark' is not defined` | No `.databricks/.databricks.env`, so the Databricks extension's IPython startup script skips creating `spark` | Run `./setup.sh` (writes it), or connect the Databricks extension; then restart the kernel. Needs the extension installed (it provides the startup script) |
 | Local run on the cluster: version or protocol mismatch error | `databricks-connect` newer than DBR 17.3 | `uv pip install --python .venv "databricks-connect==17.3.*"` (setup.sh pins it) |
 | Local run is slow to start | `.env` targets the cluster, which starts on first use | Wait a few minutes, or switch `.env` to serverless (see the comment there) |
 
