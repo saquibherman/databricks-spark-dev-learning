@@ -37,11 +37,12 @@ cd Developing_Applications_with_Apache_Spark
 1. installs the Databricks CLI and `uv` into `~/.local/bin` if missing (no sudo);
 2. logs in to your workspace (OAuth, profile `azure-de`), asking for the workspace URL once, and writes
    it to the git-ignored `databricks.local.yml` (the VS Code extension needs it in the bundle);
-3. creates `.venv` (Python 3.12) with Databricks Connect;
+3. creates `.venv` (Python 3.12) with Databricks Connect 17.3 (must match the cluster's DBR; also works on serverless);
 4. creates your course catalog `labuser_<you>`, checks `samples`, and writes `<default catalog>.ops.meta_spark_dev`;
 5. creates the classic cluster **Developing Apps with Apache Spark (&lt;you&gt;)** (DBR 17.3 LTS, dedicated,
-   1 worker, `Standard_D4ds_v5`, auto-terminates after 30 min) and terminates it right away;
-6. writes `.env` for local runs;
+   1 worker, `Standard_D4ds_v5`, auto-terminates after 30 min), terminates it right away, and adds its ID to
+   `databricks.local.yml` so the VS Code extension uses it;
+6. writes `.env` for local runs, pointing Databricks Connect at that cluster;
 7. syncs the course to `/Workspace/Users/<you>/.bundle/developing-applications-with-apache-spark-course/dev/files`.
 
 **Run the course**
@@ -136,6 +137,8 @@ Rule of thumb: **edit locally, run the lessons in the workspace** (from the sync
 | VS Code: Databricks sidebar never logs in; `UrlError: Invalid host name` | No `workspace.host` in the bundle | Run `./setup.sh`, then **Developer: Reload Window** |
 | Local run: `default auth: metadata-service ... Connection refused` | The extension's auth helper moved to a new port | `DATABRICKS_AUTH_TYPE=databricks-cli` in `.env` (setup.sh writes it); restart the kernel |
 | Local run: `cannot configure default credentials`, OAuth token expired | CLI login expired | `databricks auth login -p azure-de` |
+| Local run on the cluster: version or protocol mismatch error | `databricks-connect` newer than DBR 17.3 | `uv pip install --python .venv "databricks-connect==17.3.*"` (setup.sh pins it) |
+| Local run is slow to start | `.env` targets the cluster, which starts on first use | Wait a few minutes, or switch `.env` to serverless (see the comment there) |
 
 ---
 
